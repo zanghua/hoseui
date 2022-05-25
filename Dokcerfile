@@ -1,0 +1,42 @@
+#基础镜像
+From mcr.microsoft.com/playwright/python:v1.21.0-focal
+#镜像的制作人
+MAINTAINER zzh
+# python3.8 升级 3.9，并安装相关依赖
+RUN apt-get update \
+    && apt-get -y install software-properties-common \
+    && add-apt-repository -y ppa:deadsnakes/ppa \
+    && apt-get update \
+    && apt-get -y install python3.9 \
+    && mkdir /app && cd /app && curl -o get-pip.py -OLs https://bootstrap.pypa.io/get-pip.py\
+    && python3.9 get-pip.py
+
+
+RUN pip3.9 install allure-pytest==2.9.45 \
+    && pip3.9 install pytest==6.2.5 \
+    && pip3.9 install pytest-playwright==0.2.2 \
+    && pip3.9 install openpyxl==3.0.9 \
+    && pip3.9 install Yaml8==0.1.1 \
+    && pip3.9 install pytest-xdist==2.5.0 \
+    && pip3.9 install pytest-rerunfailures==10.2 \
+    && pip3.9 install xlwings==0.27.7 \
+    && pip3.9 install jsonpath==0.82 \
+    && pip3.9 install loguru==0.5.3 \
+    && pip3.9 install pytest-html \
+    && pip3.9 install pytest-parallel==0.1.1 \
+    && apt -y install openjdk-11-jdk \
+    && curl -o allure-2.13.8.tgz -OLs https://repo.maven.apache.org/maven2/io/qameta/allure/allure-commandline/2.13.8/allure-commandline-2.13.8.tgz \
+    && tar -zxvf allure-2.13.8.tgz -C /opt/ \
+    && ln -s /opt/allure-2.13.8/bin/allure /usr/bin/allure
+# Zadig必须 start. 根据基础镜像，添加不同工具 见：https://docs.koderover.com/zadig/v1.11.0/settings/custom-image
+# 安装工具 curl git tzdata
+RUN sed -i -E "s/[a-zA-Z0-9]+.ubuntu.com/mirrors.aliyun.com/g" /etc/apt/sources.list \
+    && DEBIAN_FRONTEND=noninteractive apt-get install -y curl git tzdata \
+    && ln -sf /usr/share/zoneinfo/Asia/Shanghai /etc/localtime \
+    && curl -fsSL "http://resources.koderover.com/docker-cli-v19.03.2.tar.gz" -o docker.tgz \
+    && tar -xvzf docker.tgz \
+    && mv docker/* /usr/local/bin
+
+RUN rm -rf /ms-playwright && playwright install
+# 配置java环境变量
+ENV JAVA_HOME /usr/lib/jvm/java-11-openjdk-amd64
