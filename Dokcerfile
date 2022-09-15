@@ -1,5 +1,6 @@
 #基础镜像
-From mcr.microsoft.com/playwright/python:v1.21.0-focal
+# From mcr.microsoft.com/playwright/python:v1.21.0-focal
+From mcr.microsoft.com/playwright/python:v1.25.0-focal
 #镜像的制作人
 MAINTAINER zzh
 # python3.8 升级 3.9，并安装相关依赖
